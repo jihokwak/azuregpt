@@ -1,0 +1,21 @@
+# Define version of docker-compose syntax
+version: '3'
+
+# Define services
+services:
+  # Define service for postgresql
+  postgresql:
+    # Use official postgresql image from Docker Hub
+    container_name: azuregpt-pg
+    image: postgres:13
+    # Set environment variables for postgresql
+    environment:
+      POSTGRES_USER: azuregpt
+      POSTGRES_PASSWORD: azuregpt
+      POSTGRES_DB: azuregpt
+    # Mount a volume for persistent data storage
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    # Expose port 5432 for external access
+    ports:
+      - "5433:5432"
