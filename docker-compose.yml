@@ -1,21 +1,53 @@
-# Define version of docker-compose syntax
 version: '3'
 
-# Define services
+# 서비스 정의
 services:
-  # Define service for postgresql
+  # postgresql 서비스 정의
   postgresql:
-    # Use official postgresql image from Docker Hub
+    # Docker Hub의 공식 postgresql 이미지 사용
     container_name: azuregpt-pg
     image: postgres:13
-    # Set environment variables for postgresql
+    # postgresql 환경 변수 설정
     environment:
       POSTGRES_USER: azuregpt
       POSTGRES_PASSWORD: azuregpt
       POSTGRES_DB: azuregpt
-    # Mount a volume for persistent data storage
+    # 지속적인 데이터 저장을 위한 볼륨 마운트
     volumes:
       - ./data:/var/lib/postgresql/data
-    # Expose port 5432 for external access
+    # 외부 접근을 위해 5432 포트 노출
     ports:
       - "5433:5432"
+    networks:
+      - azuregpt-net
+
+  webserver:
+    container_name: webserver
+    build: .
+    environment:
+      POSTGRES_USER: azuregpt
+      POSTGRES_PASSWORD: azuregpt
+      POSTGRES_DB: azuregpt
+      POSTGRES_HOST: postgresql
+      POSTGRES_PORT: 5432
+      DEBUG: true
+    # PostgreSQL 서비스에 대한 종속성 설정
+    command: >
+      bash -c "sleep 10 &&
+               python manage.py makemigrations &&
+               python manage.py migrate &&
+               python manage.py collectstatic --noinput &&
+               python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - 8000:8000
+    volumes:
+      - ./:/app
+    working_dir: /app
+    networks:
+      - azuregpt-net
+    depends_on:
+      - postgresql
+
+networks:
+  azuregpt-net:
+    driver: bridge

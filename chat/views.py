@@ -5,9 +5,7 @@ import time
 import datetime
 import tiktoken
 
-from provider.models import ApiKey
-from stats.models import TokenUsage
-from .models import Conversation, Message, Setting, Prompt
+from .models import ApiKey, Conversation, Message, Setting, Prompt, TokenUsage
 from django.conf import settings
 from django.http import StreamingHttpResponse
 from django.forms.models import model_to_dict
@@ -17,8 +15,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.decorators import api_view, authentication_classes, permission_classes, action
 from .serializers import ConversationSerializer, MessageSerializer, PromptSerializer, SettingSerializer
-from utils.search_prompt import compile_prompt
-from utils.duckduckgo_search import web_search, SearchRequest
+from azuregpt.utils.search_prompt import compile_prompt
+from azuregpt.utils.duckduckgo_search import web_search, SearchRequest
+
 
 def get_openai(openai_api_key):
     openai.api_key = openai_api_key
@@ -26,7 +25,6 @@ def get_openai(openai_api_key):
     if proxy:
         openai.api_base = proxy
     return openai
-
 
 
 class SettingViewSet(viewsets.ModelViewSet):
@@ -61,7 +59,8 @@ class ConversationViewSet(viewsets.ModelViewSet):
         queryset = self.filter_queryset(self.get_queryset())
         queryset.delete()
         return Response(status=204)
-    
+
+
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
     # authentication_classes = [JWTAuthentication]
@@ -72,9 +71,11 @@ class MessageViewSet(viewsets.ModelViewSet):
         queryset = super().get_queryset()
         conversationId = self.request.query_params.get('conversationId')
         if conversationId:
-            queryset = queryset.filter(conversation_id=conversationId).order_by('created_at')
+            queryset = queryset.filter(
+                conversation_id=conversationId).order_by('created_at')
         return queryset
-    
+
+
 class PromptViewSet(viewsets.ModelViewSet):
     serializer_class = PromptSerializer
     # authentication_classes = [JWTAuthentication]
@@ -98,7 +99,8 @@ class PromptViewSet(viewsets.ModelViewSet):
         queryset = self.filter_queryset(self.get_queryset())
         queryset.delete()
         return Response(status=204)
-    
+
+
 MODELS = {
     'gpt-3.5-turbo': {
         'name': 'gpt-3.5-turbo',

@@ -1,16 +1,18 @@
 from django.contrib import admin
 from django.forms import BooleanField
 from django.forms.widgets import CheckboxInput
-from .models import ApiKey, Conversation, Message, Setting
+from .models import ApiKey, Conversation, Message, Setting, TokenUsage
 
 
 @admin.register(ApiKey)
 class ApiKeyAdmin(admin.ModelAdmin):
-    list_display = ('api_key', 'api_type', 'api_version', 'api_base', 'token_used', 'remark', 'is_enabled', 'created_at')
+    list_display = ('api_key', 'api_type', 'api_version', 'api_base',
+                    'token_used', 'remark', 'is_enabled', 'created_at')
 
     formfield_overrides = {
         BooleanField: {'widget': CheckboxInput},
     }
+
 
 @admin.register(Conversation)
 class ConversationAdmin(admin.ModelAdmin):
@@ -19,7 +21,8 @@ class ConversationAdmin(admin.ModelAdmin):
 
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ('id', 'get_conversation_topic', 'message', 'is_bot', 'tokens','created_at')
+    list_display = ('id', 'get_conversation_topic', 'message',
+                    'is_bot', 'tokens', 'created_at')
 
     def get_conversation_topic(self, obj):
         return obj.conversation.topic
@@ -30,3 +33,8 @@ class MessageAdmin(admin.ModelAdmin):
 @admin.register(Setting)
 class SettingAdmin(admin.ModelAdmin):
     list_display = ('name', 'value')
+
+
+@admin.register(TokenUsage)
+class TokenUsageAdmin(admin.ModelAdmin):
+    list_display = ('user', 'tokens')

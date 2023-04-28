@@ -84,12 +84,12 @@ WSGI_APPLICATION = "azuregpt.wsgi.application"
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'azuregpt',
         'USER': 'azuregpt',
         'PASSWORD': 'azuregpt',
-        'HOST': 'localhost',
-        'PORT': '5433',
+        'HOST': 'azuregpt-pg',
+        'PORT': '5432',
     }
 }
 
@@ -131,12 +131,10 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / 'static'
 
-if not DEBUG :
+if not DEBUG:
     STATICFILES_DIRS = [
         BASE_DIR / 'azuregpt/static',
     ]
-
-
 
 
 # Default primary key field type
@@ -171,4 +169,5 @@ SIMPLE_JWT = {
 
 # Allauth settings
 ACCOUNT_ADAPTER = 'account.allauth.AccountAdapter'
-ACCOUNT_EMAIL_VERIFICATION = os.getenv('ACCOUNT_EMAIL_VERIFICATION', 'optional')
+ACCOUNT_EMAIL_VERIFICATION = os.getenv(
+    'ACCOUNT_EMAIL_VERIFICATION', 'optional')
